@@ -1,0 +1,84 @@
+name: GameHub Ultra Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        run: brew install xcodegen
+
+      - name: Generate Source Files
+        run: |
+          mkdir -p GameHubPro
+          
+          # Info.plist জেনারেশন (Perfect Dictionary)
+          cat <<EOF > GameHubPro/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key>
+            <string>GameHubPro</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.gamehub.emulator.ultra</string>
+            <key>CFBundleName</key>
+            <string>GameHubPro</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>2.0</string>
+            <key>CFBundleVersion</key>
+            <string>1</string>
+            <key>LSRequiresIPhoneOS</key>
+            <true/>
+            <key>UIFileSharingEnabled</key>
+            <true/>
+            <key>LSSupportsOpeningDocumentsInPlace</key>
+            <true/>
+            <key>UILaunchStoryboardName</key>
+            <string>LaunchScreen</string>
+            <key>UISupportedInterfaceOrientations</key>
+            <array>
+              <string>UIInterfaceOrientationLandscapeLeft</string>
+              <string>UIInterfaceOrientationLandscapeRight</string>
+            </array>
+          </dict>
+          </plist>
+          EOF
+
+          # Plist চেক
+          plutil -lint GameHubPro/Info.plist
+
+          # প্রোজেক্ট জেনারেট
+          xcodegen generate
+
+      - name: Build Archive
+        run: |
+          xcodebuild archive \
+            -project GameHubPro.xcodeproj \
+            -scheme GameHubPro \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/GameHubPro.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Export IPA
+        run: |
+          mkdir -p build/Payload
+          cp -r build/GameHubPro.xcarchive/Products/Applications/*.app build/Payload/
+          cd build && zip -qr GameHubUltra_Stable.ipa Payload
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameHub-Pro-Max-IPA
+          path: build/GameHubUltra_Stable.ipa
