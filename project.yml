@@ -1,19 +1,20 @@
-name: GameHubPro
+name: GameHub
 options:
   bundleIdPrefix: com.gamehub.emulator
 targets:
-  GameHubPro:
+  GameHub:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
-    sources: [GameHubPro]
+    sources: [GameHub]
     settings:
       base:
-        INFOPLIST_FILE: GameHubPro/Info.plist
-        PRODUCT_BUNDLE_IDENTIFIER: com.gamehub.emulator.ultra
-        MARKETING_VERSION: 2.0
+        INFOPLIST_FILE: GameHub/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        PRODUCT_BUNDLE_IDENTIFIER: com.gamehub.emulator.promax
+        MARKETING_VERSION: 3.0
         CURRENT_PROJECT_VERSION: 1
         TARGETED_DEVICE_FAMILY: 1
         UISupportedInterfaceOrientations: [UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
-        # JIT এবং হাই-পারফরম্যান্সের জন্য প্রয়োজনীয়
         ENABLE_BITCODE: NO
+        DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
